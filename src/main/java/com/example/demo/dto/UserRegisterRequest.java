@@ -1,34 +1,18 @@
-package com.example.demo.model;
+package com.example.demo.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserRegisterRequest {
 
     @NotBlank(message = "이름은 필수입니다")
     @Size(min = 2, max = 50, message = "이름은 2~50자 사이여야 합니다")
@@ -36,13 +20,9 @@ public class User {
 
     @Email(message = "올바른 이메일 형식이 아닙니다")
     @NotBlank(message = "이메일은 필수입니다")
-    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "비밀번호는 필수입니다")
     @Size(min = 4, message = "비밀번호는 최소 4자 이상이어야 합니다")
     private String password;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 }
