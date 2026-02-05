@@ -59,4 +59,15 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 올바르지 않습니다."));
+
+        if (!user.getPassword().equals(password)) {
+            throw new RuntimeException("이메일 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        return user;
+    }
 }

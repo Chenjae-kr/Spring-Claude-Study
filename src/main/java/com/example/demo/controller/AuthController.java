@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.UserRegisterRequest;
 import com.example.demo.dto.UserResponse;
 import com.example.demo.model.User;
@@ -24,6 +25,16 @@ public class AuthController {
         try {
             User user = userService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(user));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            User user = userService.login(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(UserResponse.from(user));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
