@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot 게시판 API</title>
+    <style>
+        :root {
+            --primary: #6DB33F;
+            --primary-dark: #5A9A30;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #666666;
+            --border: #e1e4e8;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+
+        .badge-row {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-green { background: var(--primary); color: white; }
+        .badge-blue { background: #3182ce; color: white; }
+        .badge-orange { background: #dd6b20; color: white; }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .structure-tree {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 6px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            line-height: 1.8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.65rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            min-width: 55px;
+            text-align: center;
+        }
+
+        .get { background: #38a169; }
+        .post { background: #3182ce; }
+        .put { background: #d69e2e; }
+        .delete { background: #e53e3e; }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        td code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0.75rem 0;
+        }
+
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tech-item {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .tech-item strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--text);
+        }
+
+        .tech-item span {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .cmd {
+            background: var(--code-bg);
+            color: #a5d6a7;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .cmd::before {
+            content: "$ ";
+            color: #888;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.6rem; }
+            section { padding: 1.25rem; }
+            table { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Spring Boot 게시판 API</h1>
+        <p>React 프론트엔드와 연동되는 REST API 백엔드</p>
+        <div class="badge-row">
+            <span class="badge badge-green">Spring Boot 3.2.2</span>
+            <span class="badge badge-blue">Java 17</span>
+            <span class="badge badge-orange">Maven</span>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#tech">기술 스택</a></li>
+            <li><a href="#architecture">아키텍처</a></li>
+            <li><a href="#api">API 문서</a></li>
+            <li><a href="#quickstart">시작하기</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="tech">
+            <h2>기술 스택</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <strong>Java 17</strong>
+                    <span>LTS 런타임</span>
+                </div>
+                <div class="tech-item">
+                    <strong>Spring Boot 3.2.2</strong>
+                    <span>웹 프레임워크</span>
+                </div>
+                <div class="tech-item">
+                    <strong>Spring Data JPA</strong>
+                    <span>데이터 접근 계층</span>
+                </div>
+                <div class="tech-item">
+                    <strong>PostgreSQL</strong>
+                    <span>운영 데이터베이스</span>
+                </div>
+                <div class="tech-item">
+                    <strong>H2 Database</strong>
+                    <span>테스트 인메모리 DB</span>
+                </div>
+                <div class="tech-item">
+                    <strong>Lombok</strong>
+                    <span>보일러플레이트 제거</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>프로젝트 구조</h2>
+            <p>표준 레이어드 아키텍처: Controller &rarr; Service &rarr; Repository &rarr; Model</p>
+            <div class="structure-tree">
+src/main/java/com/example/demo/<br>
+├── DemoApplication.java<br>
+├── config/<br>
+│   └── WebConfig.java<br>
+├── controller/<br>
+│   ├── HelloController.java<br>
+│   ├── PostController.java<br>
+│   └── UserController.java<br>
+├── dto/<br>
+│   └── PostCreateRequest.java<br>
+├── model/<br>
+│   ├── Post.java<br>
+│   └── User.java<br>
+├── repository/<br>
+│   ├── PostRepository.java<br>
+│   └── UserRepository.java<br>
+└── service/<br>
+    ├── PostService.java<br>
+    └── UserService.java
+            </div>
+        </section>
+
+        <section id="api">
+            <h2>API 엔드포인트</h2>
+
+            <h3>게시글 API</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/posts</code></td>
+                        <td>전체 게시글 조회</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/posts/{id}</code></td>
+                        <td>단일 게시글 조회</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td><code>/api/posts</code></td>
+                        <td>게시글 생성</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td><code>/api/posts/{id}</code></td>
+                        <td>게시글 수정</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td><code>/api/posts/{id}</code></td>
+                        <td>게시글 삭제</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/posts/search?keyword=</code></td>
+                        <td>제목 검색</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/posts/author/{author}</code></td>
+                        <td>작성자별 조회</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>요청 / 응답 예시</h3>
+            <p><strong>게시글 생성</strong> &mdash; <code>POST /api/posts</code></p>
+            <pre><code><span class="json-comment">// Request</span>
+{
+  <span class="json-key">"title"</span>: <span class="json-string">"게시글 제목"</span>,
+  <span class="json-key">"content"</span>: <span class="json-string">"게시글 내용"</span>,
+  <span class="json-key">"author"</span>: <span class="json-string">"작성자"</span>
+}</code></pre>
+            <pre><code><span class="json-comment">// Response</span>
+{
+  <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"title"</span>: <span class="json-string">"게시글 제목"</span>,
+  <span class="json-key">"content"</span>: <span class="json-string">"게시글 내용"</span>,
+  <span class="json-key">"author"</span>: <span class="json-string">"작성자"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-01"</span>
+}</code></pre>
+        </section>
+
+        <section id="quickstart">
+            <h2>시작하기</h2>
+
+            <h3>사전 요구사항</h3>
+            <p>Java 17 이상, PostgreSQL 14 이상, Maven</p>
+
+            <h3>데이터베이스 설정</h3>
+            <div class="cmd">brew services start postgresql@14</div>
+            <div class="cmd">createdb demo</div>
+
+            <h3>애플리케이션 실행</h3>
+            <div class="cmd">./mvnw spring-boot:run</div>
+            <p>서버는 <code>http://localhost:8080</code>에서 실행됩니다.</p>
+
+            <h3>테스트 실행</h3>
+            <div class="cmd">./mvnw test</div>
+
+            <h3>프론트엔드 연동</h3>
+            <p>React 프론트엔드(<code>http://localhost:5173</code>)와 연동됩니다.
+               CORS 설정이 <code>WebConfig.java</code>에 구성되어 있어
+               <code>localhost:5173</code>과 <code>localhost:3000</code>에서의 요청을 허용합니다.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/Chenjae-kr/Spring-Claude-Study">GitHub Repository</a>
+            &middot; Spring Boot 게시판 백엔드
+        </p>
+    </footer>
+</body>
+</html>
